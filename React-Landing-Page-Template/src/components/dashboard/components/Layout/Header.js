@@ -29,6 +29,7 @@ import {
   PopoverBody,
 } from 'reactstrap';
 import bn from '../../utils/bemnames';
+import UserService from "../../../../services/UserService";
 
 const bem = bn.create('header');
 
@@ -156,7 +157,7 @@ class Header extends React.Component {
                     <ListGroupItem tag="button" action className="border-light">
                       <MdHelp /> Help
                     </ListGroupItem>
-                    <ListGroupItem tag="button" action className="border-light">
+                    <ListGroupItem tag="button" action className="border-light" onClick={() => UserService.doLogout()}>
                       <MdExitToApp /> Signout
                     </ListGroupItem>
                   </ListGroup>

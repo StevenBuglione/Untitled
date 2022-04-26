@@ -7,7 +7,6 @@ import { Services } from "./services";
 import { Gallery } from "./gallery";
 import { Testimonials } from "./testimonials";
 import { Team } from "./Team";
-import { Contact } from "./contact";
 import JsonData from "./data/data.json";
 import "../../App.css";
 import React from 'react';
@@ -24,9 +23,8 @@ const LandingPage = () => {
         setLandingPageData(JsonData);
     }, []);
 
-    console.log(landingPageData.Contact)
     return (
-        <div>
+        <div id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
             <Navigation />
             <Header data={landingPageData.Header} />
             <Features data={landingPageData.Features} />
@@ -35,7 +33,6 @@ const LandingPage = () => {
             <Gallery data={landingPageData.Gallery} />
             <Testimonials data={landingPageData.Testimonials} />
             <Team data={landingPageData.Team} />
-            <Contact data={landingPageData.Contact} />
         </div>
     );
 };
