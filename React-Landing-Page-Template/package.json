@@ -18,7 +18,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
     "axios": "^0.26.1",
-    "keycloak-js": "^16.1.1",
+    "keycloak-js": "^18.0.0",
     "react-chartjs-2": "^2.7.4",
     "react-component-queries": "^2.3.0",
     "react-d3-map": "^0.8.3",

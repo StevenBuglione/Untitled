@@ -1,0 +1,77 @@
+---
+x-logging-json:
+  &json-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "10"
+
+services:
+  postgres:
+    image: "postgres:${POSTGRES_VERSION}"
+    healthcheck:
+      test: ["CMD", "nc", "-zv", "localhost", "5432"]
+      interval: 1s
+      timeout: 10s
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+      PGPASSWORD: password
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 525M
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - keycloak
+    logging: *json-logging
+
+  keycloak:
+    image: "quay.io/keycloak/keycloak:${KC_VERSION}"
+    command: ["start-dev", "--import-realm"]
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+    environment:
+      - KC_DB=postgres
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=password
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak
+      - KC_METRICS_ENABLED=true
+      - KC_HEALTH_ENABLED=true
+      - KC_LOG_LEVEL=${KC_LOG_LEVEL}
+      - KC_LOG_CONSOLE_OUTPUT=json
+      - KC_FEATURES=${KC_FEATURES}
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_REALM_NAME=${KC_REALM_NAME}
+      - UNTITLED_ADMIN_USERNAME=${UNTITLED_ADMIN_USERNAME}
+      - UNTITLED_ADMIN_PASSWORD=${UNTITLED_ADMIN_PASSWORD}
+      - UNTITLED_URL=${UNTITLED_URL}
+    ports:
+      - ${KC_PORT}:8080
+    volumes:
+      - ./realms/realm.json:/opt/keycloak/data/import/realm.json:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1100M
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - keycloak
+      - monitoring
+    logging: *json-logging
+
+networks:
+  keycloak:
+  monitoring:
+
