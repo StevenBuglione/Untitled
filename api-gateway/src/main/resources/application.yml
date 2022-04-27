@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: internet-banking-api-gateway
+  ## API SECURITY WITH KEYCLOAK PROVIDER
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            authorization-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/auth
+            jwk-set-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/certs
+            token-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/token
+            user-info-authentication-method: header
+            user-info-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/userinfo
+            user-name-attribute: preferred_username
+        registration:
+          internet-banking-core-client:
+            authorization-grant-type: authorization_code
+            client-id: ${app.config.keycloak.client-id}
+            client-secret: ${app.config.keycloak.client-secret}
+            provider: keycloak
+            redirect-uri: http://localhost:8080/login/oauth2/code/keycloak
+            scope: openid
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/certs
+
+  ## GATEWAY CONFIGURATIONS
+  cloud:
+    gateway:
+      routes:
+        ## CORE BANKING SERVICE
+        - id: core-untitled-service
+          uri: lb://core-untitled-service
+          predicates:
+            - Path=/untitled-core/**
+          filters:
+            - StripPrefix=1
+
+
+## SECURITY BASED CONFIGURATIONS
+app:
+  config:
+    keycloak:
+      url: http://localhost:8080/auth
+      realm: untitled
+      client-secret: 2ffeae6d-a454-471c-8223-56a156383e40
+      client-id: untitled-core-client
+
+server:
+  port: 8082
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8081/eureka
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty.http.client: DEBUG
